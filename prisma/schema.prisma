@@ -10,14 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  SHOP
+  CLIENT
+  DELIVERY
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  username String @unique
   email    String @unique
   password String
+  role     Role
 
   @@map("users")
 }
