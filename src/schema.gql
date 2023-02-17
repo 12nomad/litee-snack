@@ -3,17 +3,76 @@
 # ------------------------------------------------------
 
 type User {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  role: Role!
   email: String!
   password: String!
-  role: ERole!
+  verified: Boolean!
 }
 
-enum ERole {
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum Role {
   SHOP
   CLIENT
   DELIVERY
 }
 
+type UserQueryOutput {
+  success: Boolean!
+  data: User
+}
+
+type UserMutationOutput {
+  success: Boolean!
+}
+
+type AuthMutationOutput {
+  success: Boolean!
+  access_token: String
+  refresh_token: String
+}
+
 type Query {
-  getUsers: [User!]
+  getAuthUser: User
+  getUserById(getUserByIdInput: GetUserByIdDto!): UserQueryOutput!
+}
+
+input GetUserByIdDto {
+  id: ID!
+}
+
+type Mutation {
+  editUserProfile(editUserProfileInput: EditUserProfileDto!): UserMutationOutput!
+  deleteUserAccount: UserMutationOutput!
+  signup(signupInput: SignupDto!): AuthMutationOutput!
+  login(loginInput: LoginDto!): AuthMutationOutput!
+  logout: AuthMutationOutput!
+  refreshToken: AuthMutationOutput!
+  emailVerification(emailVerificationInput: EmailVerificationDto!): AuthMutationOutput!
+}
+
+input EditUserProfileDto {
+  email: String
+  password: String
+}
+
+input SignupDto {
+  role: Role!
+  email: String!
+  password: String!
+}
+
+input LoginDto {
+  email: String!
+  password: String!
+}
+
+input EmailVerificationDto {
+  code: String!
 }
