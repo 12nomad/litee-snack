@@ -11,9 +11,11 @@ import * as argon from 'argon2';
 import { createResponse, MockResponse } from 'node-mocks-http';
 import { Response } from 'express';
 
-const mockMailerService = {
-  sendMail: jest.fn(),
-};
+// const mockMailerService = {
+//   sendMail: jest.fn(),
+// };
+
+const MAILER_OPTIONS = 'MAILER_OPTIONS';
 
 enum Role {
   SHOP = 'SHOP',
@@ -44,7 +46,8 @@ const mockVerificationData = {
 describe('AuthService', () => {
   let authService: AuthService;
   let prismaService: DeepMockProxy<PrismaClient>;
-  let mailerService: typeof mockMailerService;
+  // let mailerService: typeof mockMailerService;
+  let mailerService: MailerService;
   let res: MockResponse<Response>;
   let jwtService: JwtService;
   let configService: ConfigService;
@@ -56,9 +59,24 @@ describe('AuthService', () => {
         PrismaService,
         ConfigService,
         JwtService,
+        // {
+        //   provide: MailerService,
+        //   useValue: mockMailerService,
+        // },
+        MailerService,
         {
-          provide: MailerService,
-          useValue: mockMailerService,
+          provide: MAILER_OPTIONS,
+          useValue: {
+            transport: {
+              service: 'gmail',
+              host: 'smtp.gmail.com',
+              secure: false,
+              auth: {
+                user: 'gmail',
+                pass: 'gmail',
+              },
+            },
+          },
         },
       ],
     })
