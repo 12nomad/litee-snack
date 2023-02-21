@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from '../prisma/prisma.service';
-import { AuthService } from './auth.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AuthService } from '../auth.service';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaClient } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
@@ -10,18 +10,9 @@ import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import * as argon from 'argon2';
 import { createResponse, MockResponse } from 'node-mocks-http';
 import { Response } from 'express';
-
-// const mockMailerService = {
-//   sendMail: jest.fn(),
-// };
+import { Role } from '../../common/enums/role.enum';
 
 const MAILER_OPTIONS = 'MAILER_OPTIONS';
-
-enum Role {
-  SHOP = 'SHOP',
-  CLIENT = 'CLIENT',
-  DELIVERY = 'DELIVERY',
-}
 
 const mockUserData = {
   id: 1,
@@ -59,10 +50,6 @@ describe('AuthService', () => {
         PrismaService,
         ConfigService,
         JwtService,
-        // {
-        //   provide: MailerService,
-        //   useValue: mockMailerService,
-        // },
         MailerService,
         {
           provide: MAILER_OPTIONS,
@@ -131,9 +118,9 @@ describe('AuthService', () => {
       jest
         .spyOn(mailerService, 'sendMail')
         .mockImplementation(() => Promise.resolve());
-      jest.spyOn(configService, 'get').mockImplementationOnce(() => '');
+      jest.spyOn(configService, 'get').mockReturnValue('');
       // Act
-      const result = await authService.signup(mockSignupArgs);
+      const signup = await authService.signup(mockSignupArgs);
       // Assert
       expect(prismaService.user.create).toHaveBeenCalledTimes(1);
       expect(prismaService.user.create).toHaveBeenCalledWith({
@@ -154,7 +141,7 @@ describe('AuthService', () => {
       expect(mailerService.sendMail).toHaveBeenCalledWith(expect.any(Object));
       expect(configService.get).toHaveBeenCalledTimes(1);
       expect(configService.get).toHaveBeenCalledWith(expect.any(String));
-      expect(result).toMatchObject({ success: true });
+      expect(signup).toMatchObject({ success: true });
     });
   });
 
@@ -198,6 +185,7 @@ describe('AuthService', () => {
         'E-mail or password does not match...',
       );
     });
+
     it('should sign tokens and set the cookies', async () => {
       // Arrange
       prismaService.user.findUnique.mockResolvedValue(mockUserData);
@@ -210,7 +198,7 @@ describe('AuthService', () => {
       jest.spyOn(argon, 'hash').mockResolvedValue('');
       jest.spyOn(res, 'cookie').mockImplementation(() => res);
       // Act
-      const result = await authService.login(mockLoginArgs, res);
+      const login = await authService.login(mockLoginArgs, res);
       // Assert
       expect(jwtService.signAsync).toBeCalledTimes(2);
       expect(jwtService.signAsync).toBeCalledWith(
@@ -228,7 +216,7 @@ describe('AuthService', () => {
         expect.any(String),
         expect.any(Object),
       );
-      expect(result).toMatchObject({ success: true });
+      expect(login).toMatchObject({ success: true });
     });
   });
 
@@ -247,7 +235,7 @@ describe('AuthService', () => {
       prismaService.user.updateMany.mockResolvedValue({ count: 1 });
       jest.spyOn(res, 'clearCookie');
       // Act
-      const result = await authService.logout(mockUserData.id, res);
+      const logout = await authService.logout(mockUserData.id, res);
       // Assert
       expect(prismaService.user.updateMany).toBeCalledTimes(1);
       expect(prismaService.user.updateMany).toBeCalledWith({
@@ -256,11 +244,9 @@ describe('AuthService', () => {
         },
         data: { hashedRt: null },
       });
-
       expect(res.clearCookie).toBeCalledTimes(2);
       expect(res.clearCookie).toBeCalledWith(expect.any(String));
-
-      expect(result).toMatchObject({ success: true });
+      expect(logout).toMatchObject({ success: true });
     });
   });
 
@@ -334,7 +320,7 @@ describe('AuthService', () => {
         .spyOn(authService, 'setCookies')
         .mockImplementation(() => Promise.resolve());
       // Act
-      const result = await authService.refreshToken(
+      const refreshToken = await authService.refreshToken(
         mockUserData.id,
         expect.any(String),
         res,
@@ -353,7 +339,7 @@ describe('AuthService', () => {
         expect.any(String),
         expect.any(String),
       );
-      expect(result).toMatchObject({ success: true });
+      expect(refreshToken).toMatchObject({ success: true });
     });
   });
 
@@ -396,7 +382,7 @@ describe('AuthService', () => {
       });
       prismaService.verification.delete.mockResolvedValue(mockVerificationData);
       // Act
-      const result = await authService.emailVerification({
+      const emailVerification = await authService.emailVerification({
         code: mockVerificationData.code,
       });
       // Assert
@@ -419,7 +405,7 @@ describe('AuthService', () => {
       expect(prismaService.verification.delete).toBeCalledWith({
         where: { id: mockVerificationData.id },
       });
-      expect(result).toMatchObject({ success: true });
+      expect(emailVerification).toMatchObject({ success: true });
     });
   });
 });

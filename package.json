@@ -25,7 +25,7 @@
     "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up && npm run prisma:deploy",
     "db:test:rm": "docker compose rm litee-snack-test-db -s -f -v",
     "db:test:up": "docker compose up litee-snack-test-db -d",
-    "db:test:restart": "npm run db:test:rm && npm run db:test:up && npm run prisma:deploy"
+    "db:test:restart": "npm run db:test:rm && npm run db:test:up && dotenv -e .env.test -- npm run prisma:deploy"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.8.1",
