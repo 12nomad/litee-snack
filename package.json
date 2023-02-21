@@ -108,7 +108,9 @@
       ".guard.ts",
       ".strategy.ts",
       ".module.ts",
-      ".decorator.ts"
+      ".decorator.ts",
+      "index.ts",
+      ".resolver.ts"
     ]
   }
 }

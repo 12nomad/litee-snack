@@ -6,22 +6,60 @@ import {
 } from '@nestjs/common';
 import { EditUserProfileDto } from './dtos/edit-user-profile.dto';
 import * as argon from 'argon2';
-// FIXME:
-// import { generate } from 'randomstring';
+import { generate } from 'randomstring';
 import { UserQueryOutput } from './entities/user-query-output.entity';
 import { UserMutationOutput } from './entities/user-mutation-output.entity';
+import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+    private readonly mailerService: MailerService,
+  ) {}
 
-  getAuthUser(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
+  // 👉 Utils
+  async sendVerificationEmail(subject: string, code: string, to: string) {
+    await this.mailerService.sendMail({
+      to,
+      from: {
+        name: 'Litee App.',
+        address: this.configService.get<string>('GMAIL_APP_USER') || '',
+      },
+      subject,
+      html: `
+        <div>
+          <h3>Welcome to Litee Snack!</h3>
+          <p>Please use the provided code to complete your account verification: 👉 <strong>${code}</strong> 👈</p>
+        </div>
+      `,
+    });
+  }
+
+  // 👉 User
+  async getAuthUser(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+    return { ...user, password: '' };
   }
 
   async getUserById(id: number): Promise<UserQueryOutput> {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('User not found...');
-    return { success: true, data: user };
+    return { success: true, data: { ...user, password: '' } };
+  }
+
+  async deleteUserAccount(id: number): Promise<UserMutationOutput> {
+    try {
+      await this.prisma.user.delete({ where: { id } });
+      return { success: true };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Something went wrong, please try again later...',
+      );
+    }
   }
 
   async editUserProfile(
@@ -31,28 +69,24 @@ export class UsersService {
     try {
       let hash = '';
       if (password) hash = await argon.hash(password);
-      await this.prisma.user.update({
+      const updatedUser = await this.prisma.user.update({
         where: { id },
-        data: password !== undefined ? { email } : { email, password: hash },
+        data:
+          password === undefined
+            ? { email, verified: false }
+            : { email, password: hash, verified: false },
       });
-      // FIXME:
-      // await this.prisma.verification.create({
-      //   data: {
-      //     code: generate({ length: 10 }),
-      //     userId: updatedUser.id,
-      //   },
-      // });
-      return { success: true };
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Something went wrong, please try again later...',
+      const verification = await this.prisma.verification.create({
+        data: {
+          code: generate({ length: 10 }),
+          userId: updatedUser.id,
+        },
+      });
+      await this.sendVerificationEmail(
+        'Account Verification',
+        verification.code,
+        updatedUser.email,
       );
-    }
-  }
-
-  async deleteUserAccount(id: number): Promise<UserMutationOutput> {
-    try {
-      await this.prisma.user.delete({ where: { id } });
       return { success: true };
     } catch (error) {
       throw new InternalServerErrorException(
