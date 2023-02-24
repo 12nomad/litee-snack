@@ -24,7 +24,7 @@ export class UsersResolver {
   async getUserById(
     @Args('getUserByIdInput') getUserByIdInput: GetUserByIdDto,
   ): Promise<UserQueryOutput> {
-    return await this.usersService.getUserById(getUserByIdInput.id);
+    return await this.usersService.getUserById(getUserByIdInput);
   }
 
   @UseGuards(AtGuard)

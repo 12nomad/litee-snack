@@ -8,16 +8,15 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import * as Joi from 'joi';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'testing' ? '.env.test' : '.env',
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
       ignoreEnvFile: process.env.NODE_ENV === 'production',
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string().valid('testing', 'production'),
+        NODE_ENV: Joi.string().valid('test', 'production', 'dev'),
         DATABASE_URL: Joi.string().required(),
         PORT: Joi.string().required(),
         JWT_PRIVATE: Joi.string().required(),
@@ -36,10 +35,6 @@ import { JwtModule } from '@nestjs/jwt';
       },
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      // buildSchemaOptions: {
-      //   numberScalarMode: 'integer', // number type will be processed as Int not Float in the schema
-      //   orphanedTypes: []
-      // },
     }),
     MailerModule.forRoot({
       transport: {

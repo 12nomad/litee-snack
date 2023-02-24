@@ -3,13 +3,13 @@
 # ------------------------------------------------------
 
 type User {
-  id: ID!
+  id: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
-  role: Role!
   email: String!
   password: String!
   verified: Boolean!
+  role: Role!
 }
 
 """
@@ -34,8 +34,6 @@ type UserMutationOutput {
 
 type AuthMutationOutput {
   success: Boolean!
-  access_token: String
-  refresh_token: String
 }
 
 type Query {
@@ -44,7 +42,7 @@ type Query {
 }
 
 input GetUserByIdDto {
-  id: ID!
+  id: Int!
 }
 
 type Mutation {
@@ -63,9 +61,9 @@ input EditUserProfileDto {
 }
 
 input SignupDto {
-  role: Role!
   email: String!
   password: String!
+  role: Role!
 }
 
 input LoginDto {

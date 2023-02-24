@@ -1,8 +1,7 @@
-import { ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class AuthMutationOutput {
+  @Field()
   success: boolean;
-  access_token?: string;
-  refresh_token?: string;
 }

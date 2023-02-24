@@ -11,6 +11,7 @@ import { UserQueryOutput } from './entities/user-query-output.entity';
 import { UserMutationOutput } from './entities/user-mutation-output.entity';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { GetUserByIdDto } from './dtos/get-user-by-id.dto';
 @Injectable()
 export class UsersService {
   constructor(
@@ -45,8 +46,12 @@ export class UsersService {
     return { ...user, password: '' };
   }
 
-  async getUserById(id: number): Promise<UserQueryOutput> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+  async getUserById(
+    getUserByIdInput: GetUserByIdDto,
+  ): Promise<UserQueryOutput> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: getUserByIdInput.id },
+    });
     if (!user) throw new NotFoundException('User not found...');
     return { success: true, data: { ...user, password: '' } };
   }

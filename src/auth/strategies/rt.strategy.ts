@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { getTokensFromRawHeaders } from '../../common/utils/getTokensFromRawHeaders';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 @Injectable()
@@ -19,6 +20,9 @@ export class RtStrategy extends PassportStrategy(Strategy, 'refresh-jwt') {
   private static fromCookies(req: Request): string | null {
     if (req.cookies && 'refresh_token' in req.cookies) {
       return req.cookies.refresh_token;
+    } else if (req.rawHeaders.find((el) => el.startsWith('access_token'))) {
+      const { at } = getTokensFromRawHeaders(req);
+      return at;
     }
     return null;
   }

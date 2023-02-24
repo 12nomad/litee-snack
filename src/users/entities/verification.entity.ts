@@ -5,6 +5,7 @@ import { IsNumber, IsString } from 'class-validator';
 @InputType({ isAbstract: true })
 @ObjectType()
 export class Verification extends Shared {
+  @Field()
   @IsString()
   code: string;
 
