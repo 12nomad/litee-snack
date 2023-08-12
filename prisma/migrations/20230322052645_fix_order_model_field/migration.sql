@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "orders" ALTER COLUMN "total" DROP NOT NULL,
+ALTER COLUMN "status" SET DEFAULT 'PENDING';

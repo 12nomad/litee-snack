@@ -1,0 +1,189 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SHOP
+  CLIENT
+  DELIVERY
+}
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  READY
+  PICKED
+  DELIVERED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum PaymentType {
+  ORDER
+  PROMOTION
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name             String
+  email            String  @unique
+  password         String
+  verified         Boolean
+  hashedRt         String?
+  image            String?
+  stripeCustomerId String? @unique
+
+  role         Role
+  verification Verification?
+  shops        Shop[]
+  payments     Payment[]
+  orders       Order[]       @relation(name: "orders")
+  rides        Order[]       @relation(name: "rides")
+
+  @@map("users")
+}
+
+model Verification {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  code  String?
+  reset String?
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique
+
+  @@map("verifications")
+}
+
+model Shop {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name          String   @unique
+  address       String
+  image         String?
+  isPromoted    Boolean? @default(false)
+  promotedUntil String?
+
+  categories Category[]
+  orders     Order[]
+  products   Product[]
+
+  owner   User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId Int
+
+  payment   Payment? @relation(fields: [paymentId], references: [id])
+  paymentId String?  @unique
+
+  @@map("shops")
+}
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String      @unique
+  description String
+  price       Float
+  image       String?
+  options     Json?
+  orderItems  OrderItem[]
+
+  shop   Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  shopId Int
+
+  @@map("products")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name  String  @unique
+  slug  String  @unique
+  image String?
+
+  shops Shop[]
+
+  @@map("categories")
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  currency              String
+  amount                Float
+  status                PaymentStatus
+  type                  PaymentType
+  promoDuration         Int?
+  stripePaymentIntentId String?       @unique
+
+  order Order?
+  shop  Shop?
+
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId Int?
+
+  @@map("payments")
+}
+
+model Order {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  total      Float?
+  status     OrderStatus @default(PENDING)
+  orderItems OrderItem[]
+
+  customer   User? @relation(fields: [customerId], references: [id], name: "orders", onDelete: SetNull)
+  customerId Int?
+
+  driver   User? @relation(fields: [driverId], references: [id], name: "rides", onDelete: SetNull)
+  driverId Int?
+
+  shop   Shop? @relation(fields: [shopId], references: [id], onDelete: SetNull)
+  shopId Int?
+
+  payment   Payment? @relation(fields: [paymentId], references: [id])
+  paymentId String?  @unique
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quantity     Int
+  orderChoices Json?
+  orders       Order[]
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+
+  @@map("order_items")
+}

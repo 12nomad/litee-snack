@@ -1,0 +1,455 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type MutationOutput {
+  success: Boolean!
+}
+
+type Verification {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  code: String
+  reset: String
+  user: User!
+  userId: Int!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Category {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  image: String
+  shops: [Shop!]
+  name: String!
+  slug: String!
+}
+
+type Choice {
+  extra: Float
+  label: String!
+}
+
+type Option {
+  extra: Float
+  quantity: Int
+  choices: [Choice!]
+  label: String!
+}
+
+type Product {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  image: String
+  price: Float!
+  shop: Shop
+  options: [Option!]
+  orders: [Order!]
+  name: String!
+  description: String!
+  shopId: Int!
+}
+
+type Payment {
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  amount: Float!
+  stripePaymentIntentId: String
+  status: PaymentStatus!
+  type: String!
+  promoDuration: String
+  user: User
+  order: Order
+  shop: Shop
+  currency: String!
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+type Shop {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  image: String
+  isPromoted: Boolean
+  promotedUntil: String
+  categories: [Category!]
+  products: [Product!]
+  orders: [Order!]
+  payment: Payment
+  name: String!
+  address: String!
+  ownerId: Int!
+}
+
+type OrderChoice {
+  choice: String
+  label: String!
+  quantity: Int!
+}
+
+type OrderItem {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  product: Product
+  orderChoices: [OrderChoice!]
+  productId: Int!
+  quantity: Int!
+}
+
+type Order {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  total: Float
+  status: OrderStatus!
+  customer: User
+  customerId: Int
+  driver: User
+  driverId: Int
+  shop: Shop
+  shopId: Int
+  orderItems: [OrderItem!]
+  payment: Payment
+  paymentId: String
+}
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  READY
+  PICKED
+  DELIVERED
+}
+
+type User {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  stripeCustomerId: String
+  role: Role!
+  image: String
+  verification: Verification
+  orders: [Order!]
+  rides: [Order!]
+  name: String!
+  email: String!
+  password: String!
+  verified: Boolean!
+}
+
+enum Role {
+  SHOP
+  CLIENT
+  DELIVERY
+}
+
+type CategoriesQueryOutput {
+  success: Boolean!
+  data: [Category!]
+}
+
+type CategoryQueryOutput {
+  success: Boolean!
+  data: Category
+  totalPages: Int
+  totalItems: Int
+}
+
+type CreateOrderOutput {
+  success: Boolean!
+  orderId: Int
+}
+
+type OrdersQueryOutput {
+  success: Boolean!
+  data: [Order!]
+  totalPages: Int
+  totalItems: Int
+}
+
+type OrderQueryOutput {
+  success: Boolean!
+  data: Order
+}
+
+type ShopsQueryOutput {
+  success: Boolean!
+  data: [Shop!]
+  totalPages: Int
+  totalItems: Int
+}
+
+type ShopQueryOutput {
+  success: Boolean!
+  data: Shop
+}
+
+type UserQueryOutput {
+  success: Boolean!
+  data: User
+}
+
+type PaymentsQueryOutput {
+  success: Boolean!
+  data: [Payment!]
+  totalPages: Int
+  totalItems: Int
+}
+
+type PaymentIntent {
+  clientSecret: String!
+  paymentIntent: String!
+}
+
+type CreatePromotionPaymentIntentOutput {
+  success: Boolean!
+  data: PaymentIntent
+}
+
+type Query {
+  getAuthUser: User
+  getUserById(getUserByIdInput: GetUserByIdDto!): UserQueryOutput!
+  getOwnerShops: ShopsQueryOutput!
+  getOwnerIndividualShop(getOwnerIndividualShopInput: GetOwnerIndividualShopDto!): ShopQueryOutput!
+  getShops(getShopsInput: GetShopsDto!): ShopsQueryOutput!
+  getShopById(getShopByIdInput: GetShopByIdDto!): ShopQueryOutput!
+  getShopByName(getShopByNameInput: GetShopByNameDto!): ShopsQueryOutput!
+  getPromotedShops: ShopsQueryOutput!
+  getCategories: CategoriesQueryOutput!
+  getCategoryShops(getCategoryShopsInput: getCategoryShopsDto!): CategoryQueryOutput!
+  getOrders(getOrdersInput: GetOrdersDto!): OrdersQueryOutput!
+  getOrder(getOrderInput: GetOrderDto!): OrderQueryOutput!
+  getShopOrder(getShopOrderInput: GetShopOrderDto!): OrderQueryOutput!
+  deliveryOrderDetail(deliveryOrderDetailInput: DeliveryOrderDetailDto!): OrderQueryOutput!
+  getPayments: PaymentsQueryOutput!
+  getOwnerPayments: PaymentsQueryOutput!
+}
+
+input GetUserByIdDto {
+  id: Int!
+}
+
+input GetOwnerIndividualShopDto {
+  id: Int!
+}
+
+input GetShopsDto {
+  page: Int! = 1
+  search: String
+  slug: String
+}
+
+input GetShopByIdDto {
+  id: Int!
+}
+
+input GetShopByNameDto {
+  page: Int! = 1
+  query: String!
+}
+
+input getCategoryShopsDto {
+  page: Int! = 1
+  slug: String!
+}
+
+input GetOrdersDto {
+  status: OrderStatus = PENDING
+  page: Int! = 1
+}
+
+input GetOrderDto {
+  id: Int!
+}
+
+input GetShopOrderDto {
+  id: Int!
+}
+
+input DeliveryOrderDetailDto {
+  id: Int!
+}
+
+type Mutation {
+  editUserProfile(editUserProfileInput: EditUserProfileDto!): MutationOutput!
+  deleteUserAccount: MutationOutput!
+  signup(signupInput: SignupDto!): MutationOutput!
+  passwordReset(passwordResetInput: PasswordResetDto!): MutationOutput!
+  verifyReset(verifyResetInput: VerifyResetDto!): MutationOutput!
+  updatePassword(updatePasswordInput: UpdatePasswordDto!): MutationOutput!
+  login(loginInput: LoginDto!): MutationOutput!
+  refreshToken: MutationOutput!
+  emailVerification(emailVerificationInput: EmailVerificationDto!): MutationOutput!
+  logout: MutationOutput!
+  createShop(createShopInput: CreateShopDto!): MutationOutput!
+  editShop(editShopInput: EditShopDto!): MutationOutput!
+  deleteShop(deleteShopInput: DeleteShopDto!): MutationOutput!
+  createProduct(createProductInput: CreateProductDto!): MutationOutput!
+  deleteProduct(deleteProductInput: DeleteProductDto!): MutationOutput!
+  editProduct(editProductInput: EditProductDto!): MutationOutput!
+  createOrder(createOrderInput: CreateOrderDto!): CreateOrderOutput!
+  editOrder(editOrderInput: EditOrderDto!): MutationOutput!
+  acceptNewOrder(acceptNewOrderInput: AcceptNewOrderDto!): MutationOutput!
+  createStripeUser(createStripeUserInput: CreateStripeUserDto!): MutationOutput!
+  createPaymentIntent(createPaymentIntentInput: CreatePaymentIntentDto!): CreatePromotionPaymentIntentOutput!
+  createPromotionPaymentIntent(createPromotionPaymentIntentInput: CreatePromotionPaymentIntentDto!): CreatePromotionPaymentIntentOutput!
+}
+
+input EditUserProfileDto {
+  image: String
+  name: String
+  email: String
+  prevEmail: String!
+}
+
+input SignupDto {
+  role: Role!
+  name: String!
+  email: String!
+  password: String!
+}
+
+input PasswordResetDto {
+  email: String!
+}
+
+input VerifyResetDto {
+  email: String!
+  reset: String!
+}
+
+input UpdatePasswordDto {
+  email: String!
+  password: String!
+}
+
+input LoginDto {
+  email: String!
+  password: String!
+}
+
+input EmailVerificationDto {
+  code: String
+}
+
+input CreateShopDto {
+  image: String
+  name: String!
+  address: String!
+  category: [String!]!
+}
+
+input EditShopDto {
+  image: String
+  name: String
+  address: String
+  category: [String!]
+  shopId: Int!
+}
+
+input DeleteShopDto {
+  id: Int!
+}
+
+input CreateProductDto {
+  image: String
+  price: Float!
+  options: [OptionInputType!]
+  name: String!
+  description: String!
+  shopId: Int!
+}
+
+input OptionInputType {
+  extra: Float
+  quantity: Int
+  choices: [ChoiceInputType!]
+  label: String!
+}
+
+input ChoiceInputType {
+  extra: Float
+  label: String!
+}
+
+input DeleteProductDto {
+  id: Int!
+}
+
+input EditProductDto {
+  price: Float
+  options: [OptionInputType!]
+  name: String
+  description: String
+  productId: Int!
+}
+
+input CreateOrderDto {
+  shopId: Int!
+  orderId: Int
+  orderOptions: [OrderOptionInputType!]!
+}
+
+input OrderOptionInputType {
+  productId: Int!
+  quantity: Int!
+  orderChoices: [OrderChoiceInputType!]
+}
+
+input OrderChoiceInputType {
+  choice: String
+  label: String!
+  quantity: Int!
+}
+
+input EditOrderDto {
+  id: Int!
+  status: OrderStatus! = PENDING
+}
+
+input AcceptNewOrderDto {
+  id: Int!
+  status: OrderStatus! = PENDING
+}
+
+input CreateStripeUserDto {
+  name: String!
+  email: String!
+}
+
+input CreatePaymentIntentDto {
+  stripePaymentIntentId: String
+  orderId: Int!
+  stripeCustomerId: String!
+}
+
+input CreatePromotionPaymentIntentDto {
+  amount: Float!
+  stripePaymentIntentId: String
+  shopId: Int!
+  promoDuration: Int!
+  stripeCustomerId: String!
+}
+
+type Subscription {
+  pendingOrder: Order!
+  orderStatus(orderStatusInput: OrderStatusDto!): Order!
+}
+
+input OrderStatusDto {
+  id: Int!
+}
