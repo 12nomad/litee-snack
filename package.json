@@ -12,7 +12,7 @@
     "prisma:test:deploy": "dotenv -e .env.test -- npx prisma migrate deploy",
     "prisma:dev:studio": "npx prisma studio",
     "prisma:test:studio": "dotenv -e .env.test -- npx prisma studio",
-    "start": "node dist/main",
+    "start": "nest start",
     "start:dev": "nest start --watch",
     "start:test": "npx dotenv -e .env.test nest start --watch",
     "start:debug": "nest start --debug --watch",
