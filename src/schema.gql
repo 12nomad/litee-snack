@@ -269,6 +269,7 @@ input getCategoryShopsDto {
 
 input GetOrdersDto {
   status: OrderStatus = PENDING
+  shopId: Int
   page: Int! = 1
 }
 

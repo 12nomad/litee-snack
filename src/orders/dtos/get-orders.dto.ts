@@ -3,7 +3,9 @@ import { IsNumber } from 'class-validator';
 import { Order } from '../entities/order.entity';
 
 @InputType()
-export class GetOrdersDto extends PartialType(PickType(Order, ['status'])) {
+export class GetOrdersDto extends PartialType(
+  PickType(Order, ['status', 'shopId']),
+) {
   @Field({ defaultValue: 1 })
   @IsNumber()
   page?: number;

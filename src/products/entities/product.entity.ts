@@ -39,10 +39,11 @@ export class Option {
 @ObjectType()
 export class Product extends Shared {
   @IsString()
+  @Length(2, 16)
   name: string;
 
   @IsString()
-  @Length(12, 128)
+  @Length(6, 32)
   description: string;
 
   @Field({ nullable: true })

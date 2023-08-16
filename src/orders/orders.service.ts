@@ -191,14 +191,15 @@ export class OrdersService {
           where: {
             AND: [
               { shop: { ownerId: user.sub } },
+              { shopId: getOrdersInput.shopId },
               { status: getOrdersInput.status },
+              { payment: { status: 'SUCCESS' } },
             ],
           },
           include: { orderItems: true, customer: true },
           orderBy: { updatedAt: 'desc' },
         });
         return { success: true, data: shopOrders };
-
         break;
 
       default:

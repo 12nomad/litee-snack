@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { IsBoolean, IsDate, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsDate, IsNumber, IsString, Length } from 'class-validator';
 import { Category } from '../../categories/entities/category.entity';
 import { Shared } from '../../common/entities/shared.entity';
 import { Order } from '../../orders/entities/order.entity';
@@ -10,9 +10,11 @@ import { Payment } from '../../payments/entities/payment.entity';
 @ObjectType()
 export class Shop extends Shared {
   @IsString()
+  @Length(2, 16)
   name: string;
 
   @IsString()
+  @Length(6, 32)
   address: string;
 
   @Field({ nullable: true })
