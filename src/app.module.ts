@@ -40,13 +40,14 @@ import { AtStrategy } from './auth/strategies';
         STRIPE_SECRET_KEY: Joi.string().required(),
         STRIPE_PUBLISHABLE_KEY: Joi.string().required(),
         STRIPE_WEBHOOK_SECRET: Joi.string().required(),
+        CLIENT_URL: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       cache: 'bounded',
       cors: {
-        origin: true,
+        origin: process.env.CLIENT_URL,
         credentials: true,
       },
       installSubscriptionHandlers: true,
