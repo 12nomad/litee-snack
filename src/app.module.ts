@@ -24,8 +24,7 @@ import { AtStrategy } from './auth/strategies';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
-      ignoreEnvFile: process.env.NODE_ENV === 'production',
+      ignoreEnvFile: true,
       validationSchema: Joi.object({
         NODE_ENV: Joi.string().valid('test', 'production', 'development'),
         DATABASE_URL: Joi.string().required(),
@@ -82,8 +81,8 @@ import { AtStrategy } from './auth/strategies';
         },
       },
     }),
-    PrismaModule,
     ScheduleModule.forRoot(),
+    PrismaModule,
     CommonModule,
     UsersModule,
     AuthModule,

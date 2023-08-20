@@ -5,6 +5,9 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -30,9 +33,6 @@
     "db:test:rm": "docker compose rm litee-snack-test-db -s -f -v",
     "db:test:up": "docker compose up litee-snack-test-db -d",
     "db:test:restart": "npm run db:test:rm && npm run db:test:up && npm run prisma:test:deploy"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.8.1",
