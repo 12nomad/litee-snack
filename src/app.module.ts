@@ -24,7 +24,8 @@ import { AtStrategy } from './auth/strategies';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      ignoreEnvFile: true,
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
       validationSchema: Joi.object({
         NODE_ENV: Joi.string().valid('test', 'production', 'development'),
         DATABASE_URL: Joi.string().required(),
