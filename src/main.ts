@@ -14,6 +14,7 @@ async function bootstrap() {
     },
   });
 
+  app.set('trust proxy', 1);
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
@@ -22,6 +23,6 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(Number(process.env.PORT) || 6969, '0.0.0.0');
+  await app.listen(Number(process.env.PORT), '0.0.0.0');
 }
 bootstrap();
