@@ -29,6 +29,7 @@ import { AtStrategy } from './auth/strategies';
       validationSchema: Joi.object({
         NODE_ENV: Joi.string().valid('test', 'production', 'development'),
         DATABASE_URL: Joi.string().required(),
+        DIRECT_URL: Joi.string().required(),
         PORT: Joi.string().required(),
         JWT_PRIVATE: Joi.string().required(),
         JWT_PUBLIC: Joi.string().required(),
