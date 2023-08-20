@@ -74,20 +74,14 @@ export class AuthService {
     res.cookie('__litee_snack_access_token', at, {
       httpOnly: true,
       secure: true,
-      // FIXME: change on deploy
-      domain: 'localhost',
     });
     res.cookie('__litee_snack_refresh_token', rt, {
       httpOnly: true,
       secure: true,
-      // FIXME: change on deploy
-      domain: 'localhost',
     });
     res.cookie('__litee_snack_subscription_token', st, {
       httpOnly: true,
       secure: true,
-      // FIXME: change on deploy
-      domain: 'localhost',
     });
   }
 

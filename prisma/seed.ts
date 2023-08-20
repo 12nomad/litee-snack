@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import * as argon from 'argon2';
 
 const prisma = new PrismaClient();
 
@@ -204,6 +205,17 @@ const shops = [
 ];
 
 async function main() {
+  const hashed = await argon.hash('qwerty123456');
+  await prisma.user.create({
+    data: {
+      email: 'rodan0022@gmail.com',
+      name: 'Rodan',
+      role: 'SHOP',
+      password: hashed,
+      verified: false,
+    },
+  });
+
   await prisma.category.createMany({
     data: categories,
   });
