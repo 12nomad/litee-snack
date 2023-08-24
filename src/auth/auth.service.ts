@@ -158,85 +158,6 @@ export class AuthService {
     return { success: true };
   }
 
-  async passwordReset({ email }: PasswordResetDto): Promise<MutationOutput> {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-      include: { verification: true },
-    });
-    if (!user) {
-      throw new BadRequestException(
-        'There is no account associated with that e-mail, please create an account before continuing...',
-      );
-    }
-
-    let verification: Verification | null = null;
-    if (user.verification) {
-      verification = await this.prisma.verification.update({
-        where: { userId: user.id },
-        data: {
-          reset: generate({ length: 10 }),
-        },
-      });
-    } else {
-      verification = await this.prisma.verification.create({
-        data: {
-          userId: user.id,
-          reset: generate({ length: 10 }),
-        },
-      });
-    }
-
-    await this.sendResetEmail(
-      'Password Reset',
-      verification?.reset ? verification.reset : '',
-      user.email,
-    );
-    return { success: true };
-  }
-
-  async verifyReset({ reset, email }: VerifyResetDto): Promise<MutationOutput> {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-      include: { verification: true },
-    });
-    if (user?.verification?.reset !== reset) {
-      throw new BadRequestException('The verification code does not match...');
-    }
-
-    if (user.verification) {
-      await this.prisma.verification.update({
-        where: { userId: user.id },
-        data: {
-          reset: '',
-        },
-      });
-    } else {
-      await this.prisma.verification.delete({
-        where: {
-          userId: user.id,
-        },
-      });
-    }
-
-    return { success: true };
-  }
-
-  async updatePassword({
-    password,
-    email,
-  }: UpdatePasswordDto): Promise<MutationOutput> {
-    const hashed = await argon.hash(password);
-
-    await this.prisma.user.update({
-      where: { email },
-      data: {
-        password: hashed,
-      },
-    });
-
-    return { success: true };
-  }
-
   async login(
     { email, password }: LoginDto,
     res: Response,
@@ -342,6 +263,77 @@ export class AuthService {
 
     await this.prisma.verification.delete({
       where: { id: verification.id },
+    });
+
+    return { success: true };
+  }
+
+  async passwordReset({ email }: PasswordResetDto): Promise<MutationOutput> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      include: { verification: true },
+    });
+    if (!user) {
+      throw new BadRequestException(
+        'There is no account associated with that e-mail, please create an account before continuing...',
+      );
+    }
+
+    let verification: Verification | null = null;
+    if (user.verification) {
+      verification = await this.prisma.verification.update({
+        where: { userId: user.id },
+        data: {
+          reset: generate({ length: 10 }),
+        },
+      });
+    } else {
+      verification = await this.prisma.verification.create({
+        data: {
+          userId: user.id,
+          reset: generate({ length: 10 }),
+        },
+      });
+    }
+
+    await this.sendResetEmail(
+      'Password Reset',
+      verification?.reset ? verification.reset : '',
+      user.email,
+    );
+    return { success: true };
+  }
+
+  async verifyReset({ reset, email }: VerifyResetDto): Promise<MutationOutput> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      include: { verification: true },
+    });
+    if (user?.verification?.reset !== reset) {
+      throw new BadRequestException('The verification code does not match...');
+    }
+
+    await this.prisma.verification.update({
+      where: { userId: user.id },
+      data: {
+        reset: '',
+      },
+    });
+
+    return { success: true };
+  }
+
+  async updatePassword({
+    password,
+    email,
+  }: UpdatePasswordDto): Promise<MutationOutput> {
+    const hashed = await argon.hash(password);
+
+    await this.prisma.user.update({
+      where: { email },
+      data: {
+        password: hashed,
+      },
     });
 
     return { success: true };
