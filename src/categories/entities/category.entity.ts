@@ -12,7 +12,7 @@ export class Category extends Shared {
   @IsString()
   slug: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsString()
   image: string | null;
 

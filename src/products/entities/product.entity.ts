@@ -46,7 +46,7 @@ export class Product extends Shared {
   @Length(6, 32)
   description: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsString()
   image?: string | null;
 

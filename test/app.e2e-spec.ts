@@ -4,8 +4,6 @@ import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import * as request from 'supertest';
 
-jest.setTimeout(1000000);
-
 const GRAPHQL_ENDPOINT = '/graphql';
 
 describe('App e2e', () => {
@@ -18,10 +16,15 @@ describe('App e2e', () => {
       imports: [AppModule],
     }).compile();
     app = module.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        transformOptions: { enableImplicitConversion: true },
+      }),
+    );
     await app.init();
+
     prisma = app.get(PrismaService);
-    await prisma.reset();
   });
 
   afterAll(async () => {
@@ -30,6 +33,7 @@ describe('App e2e', () => {
 
   describe('signup', () => {
     const mockSignupDto = {
+      name: 'harji',
       email: 'rharji2@gmail.com',
     };
 
@@ -41,6 +45,7 @@ describe('App e2e', () => {
             mutation {
               signup(
                 signupInput: {
+                  name: "${mockSignupDto.name}",
                   role: CLIENT
                   email: "${mockSignupDto.email}"
                   password: "123456"
@@ -65,6 +70,7 @@ describe('App e2e', () => {
             mutation {
               signup(
                 signupInput: {
+                  name: "${mockSignupDto.name}"
                   role: CLIENT
                   email: "${mockSignupDto.email}"
                   password: "123456"
@@ -119,9 +125,7 @@ describe('App e2e', () => {
         `,
         })
         .expect((res) => {
-          expect(res.body.errors[0].message).toBe(
-            'E-mail or password does not match...',
-          );
+          expect(res.body.errors[0].message).toBe('Invalid credentials...');
         });
     });
 
@@ -145,6 +149,26 @@ describe('App e2e', () => {
   });
 
   describe('getAuthUser', () => {
+    it('should throw an error if no auth user', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+             {
+              getAuthUser {
+                id
+                role
+                email               
+                verified
+              }
+            }
+        `,
+        })
+        .expect((res) => {
+          expect(res.body.errors[0].message).toBe('Unauthorized');
+        });
+    });
+
     it('should find auth user in the database', () => {
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
@@ -155,8 +179,7 @@ describe('App e2e', () => {
               getAuthUser {
                 id
                 role
-                email
-                password
+                email               
                 verified
               }
             }
@@ -164,27 +187,6 @@ describe('App e2e', () => {
         })
         .expect((res) => {
           expect(res.body.data.getAuthUser).toBeTruthy();
-        });
-    });
-
-    it('should throw an error if no auth user', () => {
-      return request(app.getHttpServer())
-        .post(GRAPHQL_ENDPOINT)
-        .send({
-          query: `
-             {
-              getAuthUser {
-                id
-                role
-                email
-                password
-                verified
-              }
-            }
-        `,
-        })
-        .expect((res) => {
-          expect(res.body.errors[0].message).toBe('Unauthorized');
         });
     });
   });
@@ -226,12 +228,13 @@ describe('App e2e', () => {
 
     beforeAll(async () => {
       const verification = await prisma.verification.findFirst();
-      verificationCode = verification?.code;
+      verificationCode = verification?.code || '';
     });
 
     it('should fail on invalid verification code', () => {
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
+        .set('Cookie', header)
         .send({
           query: `
             mutation {
@@ -251,6 +254,7 @@ describe('App e2e', () => {
     it('should succeed on valid verification code', () => {
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
+        .set('Cookie', header)
         .send({
           query: `
             mutation {

@@ -1,4 +1,4 @@
-import { ObjectType, Field } from '@nestjs/graphql';
+import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { MutationOutput } from '../../common/entities/mutation-output.entity';
 import { Category } from './category.entity';
 
@@ -13,9 +13,9 @@ export class CategoryQueryOutput extends MutationOutput {
   @Field(() => Category, { nullable: true })
   data?: Category | null;
 
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   totalPages?: number | null;
 
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   totalItems?: number | null;
 }

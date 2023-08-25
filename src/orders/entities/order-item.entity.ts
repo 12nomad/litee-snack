@@ -13,7 +13,7 @@ export class OrderChoice {
   @IsNumber()
   quantity: number;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   choice?: string | null;
 }
 

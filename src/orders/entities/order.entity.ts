@@ -1,4 +1,4 @@
-import { Field, Float, InputType, ObjectType } from '@nestjs/graphql';
+import { Field, Float, InputType, Int, ObjectType } from '@nestjs/graphql';
 import { IsEnum, IsNumber, IsString } from 'class-validator';
 import { Shared } from '../../common/entities/shared.entity';
 import { OrderStatus } from '../../common/enums/order-status.enum';
@@ -21,21 +21,21 @@ export class Order extends Shared {
   @Field(() => User, { nullable: true })
   customer?: User | null;
 
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   @IsNumber()
   customerId?: number | null;
 
   @Field(() => User, { nullable: true })
   driver?: User | null;
 
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   @IsNumber()
   driverId?: number | null;
 
   @Field(() => Shop, { nullable: true })
   shop?: Shop | null;
 
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   @IsNumber()
   shopId?: number | null;
 
@@ -46,7 +46,7 @@ export class Order extends Shared {
   @Field(() => Payment, { nullable: true })
   payment?: Payment | null;
 
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   @IsString()
   paymentId?: string | null;
 }

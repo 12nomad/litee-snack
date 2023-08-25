@@ -17,15 +17,15 @@ export class Shop extends Shared {
   @Length(6, 32)
   address: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsString()
   image?: string | null;
 
-  @Field({ nullable: true, defaultValue: false })
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
   @IsBoolean()
   isPromoted?: boolean | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsString()
   promotedUntil?: string | null;
 
