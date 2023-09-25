@@ -46,7 +46,7 @@ export class Order extends Shared {
   @Field(() => Payment, { nullable: true })
   payment?: Payment | null;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => String, { nullable: true })
   @IsString()
   paymentId?: string | null;
 }
