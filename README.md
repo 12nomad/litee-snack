@@ -4,7 +4,7 @@ An all-in-one app that lets you order from multiple local restaurants and get yo
 
 <img width="1900" height="929" alt="snack" src="https://github.com/user-attachments/assets/9542ba7d-4e9f-468f-8c15-9ff26afbeb8b" />
 
-[Google Drive Demo](https://drive.google.com/file/d/1qLve47tLz62yzmL4qAHuuK3xMw-J038Y/view?usp=drive_link)
+## 👉 [App Demo](https://drive.google.com/file/d/1qLve47tLz62yzmL4qAHuuK3xMw-J038Y/view?usp=drive_link)
 
 ## 🚀 Tech Stack
 
