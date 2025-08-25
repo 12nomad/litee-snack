@@ -13,6 +13,7 @@ An all-in-one app that lets you order from multiple local restaurants and get yo
 - Passport.js for authentication (with cookies)
 - GraphQL Subscription for realtime update stream
 - Stripe for payment and subscription
+- Cloudinary for file upload
 - Nodemailer for notification, payment, registration and password reset
 
 ## ✨ Features
