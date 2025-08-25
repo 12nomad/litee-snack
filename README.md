@@ -31,10 +31,10 @@ An all-in-one app that lets you order from multiple local restaurants and get yo
 
 ```bash
 # Clone the repo
-git clone https://github.com/12nomad/litee-app.git
+git clone https://github.com/12nomad/litee-snack.git
 
 # Navigate to project folder
-cd litee-app
+cd litee-snack
 
 # Install dependencies
 npm i
